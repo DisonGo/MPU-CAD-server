@@ -29,6 +29,7 @@ async function main() {
         }))
         .use(projectRouter(client))
         .use(userRouter(client))
+        .use(express.static('assets'))
     if(app.get('env')!="development")app.use(requireHTTPS);
     app.listen(port, () => {
         console.log(`Listening to ${port}`);
