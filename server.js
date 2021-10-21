@@ -4,7 +4,7 @@ const {
 } = require('mongodb')
 const cors = require('cors')
 const projectRouter = require('./scripts/projectRouter')
-const userRouter = require('./scripts/userRouter')
+const teamWorkerRouter = require('./scripts/teamWorkerRouter')
 
 function requireHTTPS(req, res, next) {
     if (!req.secure && req.get('x-forwarded-proto') !== 'https') {
@@ -28,7 +28,7 @@ async function main() {
             extended: true
         }))
         .use(projectRouter(client))
-        .use(userRouter(client))
+        .use(teamWorkerRouter(client))
         .use(express.static('assets'))
     if(app.get('env')!="development")app.use(requireHTTPS);
     app.listen(port, () => {
