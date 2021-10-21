@@ -4,12 +4,12 @@ const time = require('./consTime')
 
 
 
-function usersRouter(client) {
+function teamWorkersRouter(client) {
   let db = client.db("CAD")
-  let col = db.collection("users")
+  let col = db.collection("teamWorkers")
 
-  const router = new express.Router()
-  router.post('/users', (req, res, next) => {
+  const router = new express.Router('teamWorkers')
+  router.post('/teamWorkers', (req, res, next) => {
     try {
       col.insertOne({
         name: req.body.name,
@@ -30,7 +30,7 @@ function usersRouter(client) {
       });
     }
   });
-  router.get('/users', function (req, res, next) {
+  router.get('/teamWorkers', function (req, res, next) {
     try {
       col.find({}).toArray((e, result) => {
         console.log(`${time.getTime()}` + chalk.green `GET` + ":200");
@@ -44,7 +44,7 @@ function usersRouter(client) {
       });
     }
   });
-  router.put('/users/:id', function (req, res, next) {
+  router.put('/teamWorkers/:id', function (req, res, next) {
     try {
       col.updateOne({
         _id: new mongodb.ObjectId(req.params.id)
@@ -69,7 +69,7 @@ function usersRouter(client) {
       });
     }
   });
-  router.delete('/users/:id', function (req, res, next) {
+  router.delete('/teamWorkers/:id', function (req, res, next) {
     try {
       col.deleteOne({
         _id: new mongodb.ObjectId(req.params.id),
@@ -89,4 +89,4 @@ function usersRouter(client) {
   });
   return router;
 }
-module.exports = usersRouter
+module.exports = teamWorkersRouter
