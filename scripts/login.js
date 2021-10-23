@@ -11,7 +11,9 @@ const { yellow } = require('chalk');
 
 
 const RSA_PRIVATE_KEY = fs.readFileSync('./login/private.key');
-const KEY_LIFETIME = 15
+const KEY_LIFETIME = 10 * 60
+
+
 let db, col
 const mongoUrl = "mongodb+srv://mpuCADdb:b7TmLx7UR7wq3KB@learningdbcluster.0oiga.mongodb.net/CAD?";
 
