@@ -1,6 +1,6 @@
 const express = require('express')
 const chalk = require('chalk')
-const time = require('./consTime')
+const cons = require('./cons')
 
 
 
@@ -17,13 +17,13 @@ function teamWorkersRouter(client) {
         project: req.body.project,
         imgLink: req.body.imgLink
       }).then(() => {
-        console.log(`${time.getTime()}` + chalk.green `POST` + ":200");
+        cons.log("POST", true, `teamWorker`, "yellow")
         res.status(200).json({
           status: 'ok'
         });
       })
     } catch (error) {
-      console.log(`${time.getTime()}` + chalk.red `POST` + ":500");
+      cons.log("POST", false, `teamWorker`, "yellow")
       console.error(error);
       res.status(500).json({
         status: 'error'
@@ -33,11 +33,11 @@ function teamWorkersRouter(client) {
   router.get('/teamWorkers', function (req, res, next) {
     try {
       col.find({}).toArray((e, result) => {
-        console.log(`${time.getTime()}` + chalk.green `GET` + ":200");
+        cons.log("GET", true, `teamWorker`, "yellow")
         res.status(200).json(result);
       })
     } catch (error) {
-      console.log(`${time.getTime()}` + chalk.red `GET` + ":500");
+      cons.log("GET", false, `teamWorker`, "yellow")
       console.error(error);
       res.status(500).json({
         status: 'error'
@@ -56,13 +56,13 @@ function teamWorkersRouter(client) {
         imgLink: req.body.imgLink
         }
       }).then(() => {
-        console.log(`${time.getTime()}` + chalk.green `PUT` + ":200");
+        cons.log("PUT", true, `teamWorker`, "yellow")
         res.status(200).json({
           status: 'ok'
         });
       })
     } catch (error) {
-      console.log(`${time.getTime()}` + chalk.red `PUT` + ":500");
+      cons.log("PUT", false, `teamWorker`, "yellow")
       console.error(error);
       res.status(500).json({
         status: 'error'
@@ -74,13 +74,13 @@ function teamWorkersRouter(client) {
       col.deleteOne({
         _id: new mongodb.ObjectId(req.params.id),
       }).then(() => {
-        console.log(`${time.getTime()}` + chalk.green `DELETE` + ":200");
+        cons.log("DELETE", true, `teamWorker`, "yellow")
         res.status(200).json({
           status: 'ok'
         });
       })
     } catch (error) {
-      console.log(`${time.getTime()}` + chalk.red `DELETE` + ":500");
+      cons.log("GET", false, `teamWorker`, "yellow")
       console.error(error);
       res.status(500).json({
         status: 'error'

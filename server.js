@@ -1,15 +1,22 @@
-const express = require('express')
-const login = require('./scripts/login');
+const nodeRsa = require('node-rsa');
+const expressJwt = require('express-jwt');
+const fs = require('fs');
 
-
+const express = require('./scripts/express-p');
 const {
     MongoClient
 } = require('mongodb')
 const cors = require('cors')
-// const cookieParser = require('cookie-parser');
-
 const projectRouter = require('./scripts/projectRouter')
-const teamWorkerRouter = require('./scripts/teamWorkerRouter')
+const teamWorkerRouter = require('./scripts/teamWorkerRouter');
+const loginRouter = require('./scripts/login');
+
+const RSA_PUBLIC_KEY = fs.readFileSync('./login/public.key');
+
+const checkIfAuthenticated = expressJwt({
+    secret: RSA_PUBLIC_KEY,
+    algorithms: ['RS256']
+});
 
 function requireHTTPS(req, res, next) {
     if (!req.secure && req.get('x-forwarded-proto') !== 'https') {
@@ -32,12 +39,18 @@ async function main() {
         .use(express.urlencoded({
             extended: true
         }))
-        // .use(cookieParser.JSONCookie)
         .use(projectRouter(client))
         .use(teamWorkerRouter(client))
-        .use(login(client))
+        .post('/login', loginRouter)
         .use(express.static('assets'))
-    if(app.get('env')!="development")app.use(requireHTTPS);
+    app.route('/login/admin')
+        .get(checkIfAuthenticated,function (req, res, next) {
+            res.status(200).json({
+                status: "Authorized"
+            })
+            next()
+        })
+    if (app.get('env') != "development") app.use(requireHTTPS);
     app.listen(port, () => {
         console.log(`Listening to ${port}`);
     })

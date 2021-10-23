@@ -1,60 +1,64 @@
 const express = require('express')
 const chalk = require('chalk')
-const jwt= require('jsonwebtoken');
-const time = require('./consTime')
+const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const {
+    MongoClient
+} = require('mongodb')
+const cons = require('./cons')
 const fs = require("fs");
-const RSA_PRIVATE_KEY = fs.readFileSync('./login/private.key');
-let db, col
+const { yellow } = require('chalk');
 
-function findUserIdForEmail(user) {
-    let ans = col.findOne(user, {
-        _id: 1
-    })
-    return ans 
-}
+
+const RSA_PRIVATE_KEY = fs.readFileSync('./login/private.key');
+const KEY_LIFETIME = 15
+let db, col
+const mongoUrl = "mongodb+srv://mpuCADdb:b7TmLx7UR7wq3KB@learningdbcluster.0oiga.mongodb.net/CAD?";
+
+const client = new MongoClient(mongoUrl)
 
 function validateEmailAndPassword(user) {
-    let ans = col.findOne(user) || false
-    if (ans != false) ans = true
-    return ans
+    return col.findOne({
+        "email": user.email,
+        password: user.password
+    })
 }
 
-function loginRouter(client) {
+async function loginRouter(req, res, next) {
+    await client.connect()
     db = client.db("CAD")
     col = db.collection("login")
+    const user = {
+        email: req.body.email,
+        password: req.body.password
+    }
 
-    const router = new express.Router()
-    router.post('/login', (req, res, next) => {
-        const user = {
-            email: req.body.email,
-            password: req.body.password
-        }
-        try {
-            if (validateEmailAndPassword()) {
-                const userId = findUserIdForEmail(user.email);
-
+    try {
+        let data = await validateEmailAndPassword(user)
+            let _id = data ? data._id.toString() : false
+            if (_id != false) {
                 const jwtBearerToken = jwt.sign({}, RSA_PRIVATE_KEY, {
                     algorithm: 'RS256',
-                    expiresIn: 120,
-                    subject: userId
+                    expiresIn: KEY_LIFETIME,
+                    subject: _id
                 })
-                console.log(`${time.getTime()}`+chalk.green`POST`+ chalk.yellow` login :200 ${user.email}`);
+                cons.log("POST",true,` login: 200 ${user.email}`,"yellow")
                 res.status(200).json({
-                    status: 'ok',
-                    token: jwtBearerToken
+                    id_token: jwtBearerToken,
+                    expires_at: KEY_LIFETIME
                 });
             } else {
                 throw "401"
             }
-        } catch (error) {
-            console.log(`${time.getTime()}` +chalk.red`POST`+ chalk.yellow` login ${error} ${user.email}` );
-            console.error(error);
-            res.status(401).json({
-                status: 'Unauthorized'
-            });
-        }
-    });
 
-    return router
-}
+    } catch (error) {
+        cons.log("POST",false,` login: 200 ${user.email}`,"yellow")
+        console.error(error);
+        res.status(401).json({
+            status: 'Unauthorized'
+        });
+    }
+    next()
+};
+
 module.exports = loginRouter

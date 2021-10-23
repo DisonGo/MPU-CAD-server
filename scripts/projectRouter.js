@@ -1,6 +1,6 @@
 const express = require('express')
 const chalk = require('chalk')
-const time = require('./consTime')
+const cons = require('./cons')
 
 
 function projectsRouter(client) {
@@ -17,13 +17,13 @@ function projectsRouter(client) {
                 frontImgLink: req.body.frontImgLink,
                 innerImgLink: req.body.innerImgLink
             }).then(() => {
-                console.log(`${time.getTime()}` + chalk.green `POST` + ":200");
+                cons.log("POST", true, `project`, "yellow")
                 res.status(200).json({
                     status: 'ok'
                 });
             })
         } catch (error) {
-            console.log(`${time.getTime()}` + chalk.red `POST` + ":500");
+            cons.log("POST", false, `project`, "yellow")
             console.error(error);
             res.status(500).json({
                 status: 'error'
@@ -33,11 +33,11 @@ function projectsRouter(client) {
     router.get('/projects', function (req, res, next) {
         try {
             col.find({}).toArray((e, result) => {
-                console.log(`${time.getTime()}` + chalk.green `GET` + ":200");
+                cons.log("GET", true, `project`, "yellow")
                 res.status(200).json(result);
             })
         } catch (error) {
-            console.log(`${time.getTime()}` + chalk.red `GET` + ":500");
+            cons.log("GET", false, `project`, "yellow")
             console.error(error);
             res.status(500).json({
                 status: 'error'
@@ -57,13 +57,13 @@ function projectsRouter(client) {
                     innerImgLink: req.body.innerImgLink
                 }
             }).then(() => {
-                console.log(`${time.getTime()}` + chalk.green `PUT` + ":200");
+                cons.log("PUT", true, `project`, "yellow")
                 res.status(200).json({
                     status: 'ok'
                 });
             })
         } catch (error) {
-            console.log(`${time.getTime()}` + chalk.red `PUT` + ":500");
+            cons.log("PUT", false, `project`, "yellow")
             console.error(error);
             res.status(500).json({
                 status: 'error'
@@ -75,13 +75,13 @@ function projectsRouter(client) {
             col.deleteOne({
                 _id: new mongodb.ObjectId(req.params.id),
             }).then(() => {
-                console.log(`${time.getTime()}` + chalk.green `DELETE` + ":200");
+                cons.log("DELETE", true, `project`, "yellow")
                 res.status(200).json({
                     status: 'ok'
                 });
             })
         } catch (error) {
-            console.log(`${time.getTime()}` + chalk.red `DELETE` + ":500");
+            cons.log("GET", false, `project`, "yellow")
             console.error(error);
             res.status(500).json({
                 status: 'error'
