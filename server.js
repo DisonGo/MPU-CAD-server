@@ -10,7 +10,9 @@ const cors = require('cors')
 const projectRouter = require('./scripts/projectRouter')
 const teamWorkerRouter = require('./scripts/teamWorkerRouter');
 const loginRouter = require('./scripts/login');
-
+const cons = require('./scripts/cons');
+const fileUpload = require('express-fileupload');
+const assetsRouter = require('./scripts/uploadAssets');
 const RSA_PUBLIC_KEY = fs.readFileSync('./login/public.key');
 
 const checkIfAuthenticated = expressJwt({
@@ -43,13 +45,22 @@ async function main() {
         .use(teamWorkerRouter(client))
         .post('/login', loginRouter)
         .use(express.static('assets'))
+        .use(fileUpload())
+        .use(assetsRouter())
     app.route('/login/admin')
-        .get(checkIfAuthenticated,function (req, res, next) {
-            res.status(200).json({
-                status: "Authorized"
+        .get(checkIfAuthenticated,
+            function (error, req, res, next) {
+                if (error.name === 'UnauthorizedError') {
+                    cons.log("GET",false,'token invalid/expired','yellow')
+                    res.status(401).send('invalid token');
+                }
+            },
+            function (req, res, next) {
+                res.status(200).json({
+                    status: "Authorized"
+                })
+                next()
             })
-            next()
-        })
     if (app.get('env') != "development") app.use(requireHTTPS);
     app.listen(port, () => {
         console.log(`Listening to ${port}`);

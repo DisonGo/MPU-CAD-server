@@ -7,11 +7,10 @@ const {
 } = require('mongodb')
 const cons = require('./cons')
 const fs = require("fs");
-const { yellow } = require('chalk');
 
 
 const RSA_PRIVATE_KEY = fs.readFileSync('./login/private.key');
-const KEY_LIFETIME = 10 * 60
+const KEY_LIFETIME = 30 * 60
 
 
 let db, col
